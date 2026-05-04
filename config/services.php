@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    'google' => [
+        'api_key' => env('GOOGLE_AI_API_KEY'),
+        'image_model' => env('GOOGLE_IMAGE_MODEL', 'gemini-3-pro-image-preview'),
+        'text_model' => env('GOOGLE_TEXT_MODEL', 'gemini-2.0-flash'),
+    ],
+
+    'meta' => [
+        'app_id' => env('META_APP_ID'),
+        'app_secret' => env('META_APP_SECRET'),
+        'redirect_uri' => env('META_REDIRECT_URI'),
+    ],
+
 ];
