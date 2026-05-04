@@ -85,9 +85,12 @@ Campaign data:
             $payload['generationConfig'] = ['responseMimeType' => $responseMimeType];
         }
 
-        $response = Http::withHeaders(['Content-Type' => 'application/json'])
-            ->timeout(60)
-            ->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}", $payload);
+        $response = Http::withHeaders([
+                'Content-Type'    => 'application/json',
+                'x-goog-api-key' => $this->apiKey,
+            ])
+            ->timeout(180)
+            ->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent", $payload);
 
         if (! $response->successful()) {
             return null;

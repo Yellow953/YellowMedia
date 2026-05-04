@@ -16,13 +16,25 @@ class GeminiImageService
         $this->model = config('services.google.image_model', 'gemini-3-pro-image-preview');
     }
 
-    public function generate(string $prompt, string $tenantId): ?string
+    public function generate(string $prompt, string $tenantId, string $format = 'post'): ?string
     {
-        $response = Http::withHeaders(['Content-Type' => 'application/json'])
+        $aspectRatio = match ($format) {
+            'story'  => '9:16',
+            'banner' => '16:9',
+            default  => '1:1',
+        };
+
+        $response = Http::withHeaders([
+                'Content-Type'    => 'application/json',
+                'x-goog-api-key' => $this->apiKey,
+            ])
             ->timeout(120)
-            ->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}", [
+            ->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent", [
                 'contents' => [['parts' => [['text' => $prompt]]]],
-                'generationConfig' => ['responseModalities' => ['IMAGE', 'TEXT']],
+                'generationConfig' => [
+                    'responseModalities' => ['IMAGE', 'TEXT'],
+                    'imageConfig'        => ['aspectRatio' => $aspectRatio],
+                ],
             ]);
 
         if (! $response->successful()) {
@@ -36,7 +48,7 @@ class GeminiImageService
                 $imageData = base64_decode($part['inlineData']['data']);
                 $extension = $this->mimeToExtension($part['inlineData']['mimeType'] ?? 'image/png');
                 $path = "generated/{$tenantId}/" . uniqid() . ".{$extension}";
-                Storage::put($path, $imageData);
+                Storage::disk('public')->put($path, $imageData);
 
                 return $path;
             }

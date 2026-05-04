@@ -17,7 +17,7 @@ class MetaAdsService
 
         foreach ($accounts as $account) {
             $token = $account->decrypted_token;
-            $accountId = $account->account_id;
+            $accountId = ltrim($account->account_id, 'act_');
 
             $response = Http::get("{$this->apiBase}/act_{$accountId}/campaigns", [
                 'fields' => 'id,name,status,objective,daily_budget,lifetime_budget',
@@ -68,7 +68,7 @@ class MetaAdsService
     {
         $account = $campaign->adAccount;
         $token = $account->decrypted_token;
-        $accountId = $account->account_id;
+        $accountId = ltrim($account->account_id, 'act_');
 
         $metaCampaign = Http::post("{$this->apiBase}/act_{$accountId}/campaigns", [
             'name' => $campaign->name,

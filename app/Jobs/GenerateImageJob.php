@@ -22,7 +22,7 @@ class GenerateImageJob implements ShouldQueue
     public function handle(GeminiImageService $service): void
     {
         $prompt = $service->buildPrompt($this->params);
-        $path = $service->generate($prompt, (string) $this->image->tenant_id);
+        $path = $service->generate($prompt, (string) $this->image->tenant_id, $this->params['format'] ?? 'post');
 
         if ($path) {
             $this->image->update([

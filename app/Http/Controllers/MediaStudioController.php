@@ -66,7 +66,7 @@ class MediaStudioController extends Controller
             ->findOrFail($id);
 
         if ($image->file_path) {
-            \Storage::delete($image->file_path);
+            \Storage::disk('public')->delete($image->file_path);
         }
 
         $image->delete();
