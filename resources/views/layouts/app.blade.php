@@ -115,6 +115,26 @@
         .table th { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6c757d; border-bottom: 2px solid #e9ecef; }
         .table td { vertical-align: middle; font-size: 0.875rem; }
 
+        /* Pagination */
+        .ym-pagination-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; flex-wrap: wrap; gap: .5rem; }
+        .ym-pagination { display: flex; align-items: center; gap: .25rem; list-style: none; margin: 0; padding: 0; }
+        .ym-page-link {
+            display: flex; align-items: center; justify-content: center;
+            min-width: 34px; height: 34px; padding: 0 .6rem;
+            border-radius: 8px;
+            font-size: .8125rem; font-weight: 500;
+            color: #374151;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            text-decoration: none;
+            transition: all .15s;
+            line-height: 1;
+        }
+        .ym-page-item a.ym-page-link:hover { background: #f9fafb; border-color: #d1d5db; color: #111; }
+        .ym-page-item.active .ym-page-link { background: var(--yellow); border-color: var(--yellow); color: #111; font-weight: 700; }
+        .ym-page-item.disabled .ym-page-link { opacity: .4; cursor: default; }
+        .ym-pagination-info { font-size: .8rem; color: #6b7280; }
+
         /* Status badges */
         .badge-active { background: #d1fae5; color: #065f46; font-size: .7rem; font-weight: 600; padding: .3em .65em; border-radius: 5px; }
         .badge-paused { background: #fef3c7; color: #92400e; font-size: .7rem; font-weight: 600; padding: .3em .65em; border-radius: 5px; }

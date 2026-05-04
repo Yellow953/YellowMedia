@@ -52,9 +52,11 @@ Route::middleware(['auth', 'scope.tenant'])->group(function () {
 
     // Settings
     Route::prefix('settings')->name('settings.')->group(function () {
-        Route::get('/', [SettingsController::class, 'index'])->name('index');
-        Route::get('/ad-accounts', [SettingsController::class, 'adAccounts'])->name('ad-accounts');
-        Route::delete('/ad-accounts/{id}', [SettingsController::class, 'removeAdAccount'])->name('ad-accounts.remove');
+        Route::get('/',                           [SettingsController::class, 'index'])->name('index');
+        Route::put('/profile',                    [SettingsController::class, 'updateProfile'])->name('profile.update');
+        Route::put('/password',                   [SettingsController::class, 'updatePassword'])->name('password.update');
+        Route::get('/ad-accounts',                [SettingsController::class, 'adAccounts'])->name('ad-accounts');
+        Route::delete('/ad-accounts/{id}',        [SettingsController::class, 'removeAdAccount'])->name('ad-accounts.remove');
     });
 
     // Super Admin
