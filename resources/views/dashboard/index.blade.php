@@ -59,6 +59,83 @@
     </div>
 </div>
 
+{{-- Usage / Plan widget (hidden for super admin with no tenant) --}}
+@if($usage)
+<div class="card mb-4">
+    <div class="card-body px-4 py-3">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="fw-semibold" style="font-size:.875rem;">Plan Usage</span>
+            <span class="badge rounded-pill px-3 py-1 fw-semibold"
+                  style="background:{{ $usage['plan'] === 'pro' ? 'var(--yellow)' : ($usage['plan'] === 'starter' ? '#dbeafe' : '#f3f4f6') }};
+                         color:{{ $usage['plan'] === 'pro' ? 'var(--black)' : ($usage['plan'] === 'starter' ? '#1e40af' : '#374151') }};
+                         font-size:.75rem;">
+                {{ $usage['plan_name'] }}
+            </span>
+        </div>
+        <div class="row g-4">
+            {{-- Images --}}
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between mb-1" style="font-size:.8rem;">
+                    <span class="text-muted">Images this month</span>
+                    <span class="fw-semibold">
+                        {{ $usage['images_used'] }}
+                        @if($usage['images_limit'] > 0) / {{ $usage['images_limit'] }} @else <span class="text-muted">/ ∞</span> @endif
+                    </span>
+                </div>
+                @if($usage['images_limit'] > 0)
+                <div class="progress" style="height:6px;border-radius:99px;">
+                    <div class="progress-bar" role="progressbar"
+                         style="width:{{ $usage['images_pct'] }}%;
+                                background:{{ $usage['images_pct'] >= 90 ? '#ef4444' : 'var(--yellow)' }};
+                                border-radius:99px;"></div>
+                </div>
+                @if($usage['images_pct'] >= 90)
+                    <div class="mt-1 text-danger" style="font-size:.75rem;"><i class="bi bi-exclamation-circle me-1"></i>Approaching limit</div>
+                @endif
+                @else
+                <div class="progress" style="height:6px;border-radius:99px;">
+                    <div class="progress-bar" style="width:30%;background:var(--yellow);border-radius:99px;"></div>
+                </div>
+                <div class="mt-1 text-muted" style="font-size:.75rem;">Unlimited on Pro</div>
+                @endif
+            </div>
+            {{-- Campaigns --}}
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between mb-1" style="font-size:.8rem;">
+                    <span class="text-muted">Campaigns</span>
+                    <span class="fw-semibold">
+                        {{ $usage['campaigns_used'] }}
+                        @if($usage['campaigns_limit'] > 0) / {{ $usage['campaigns_limit'] }} @else <span class="text-muted">/ ∞</span> @endif
+                    </span>
+                </div>
+                @if($usage['campaigns_limit'] > 0)
+                <div class="progress" style="height:6px;border-radius:99px;">
+                    <div class="progress-bar" role="progressbar"
+                         style="width:{{ $usage['campaigns_pct'] }}%;
+                                background:{{ $usage['campaigns_pct'] >= 90 ? '#ef4444' : '#6366f1' }};
+                                border-radius:99px;"></div>
+                </div>
+                @if($usage['campaigns_pct'] >= 90)
+                    <div class="mt-1 text-danger" style="font-size:.75rem;"><i class="bi bi-exclamation-circle me-1"></i>Approaching limit</div>
+                @endif
+                @else
+                <div class="progress" style="height:6px;border-radius:99px;">
+                    <div class="progress-bar" style="width:30%;background:#6366f1;border-radius:99px;"></div>
+                </div>
+                <div class="mt-1 text-muted" style="font-size:.75rem;">Unlimited on Pro</div>
+                @endif
+            </div>
+        </div>
+        @if(! $usage['ai_suggestions'])
+        <div class="mt-3 pt-3 border-top d-flex align-items-center justify-content-between">
+            <span style="font-size:.8rem;color:#6b7280;"><i class="bi bi-stars me-1"></i>AI suggestions &amp; review are available on Starter and Pro plans.</span>
+            <a href="{{ route('settings.index') }}" class="btn btn-yellow btn-sm">Upgrade</a>
+        </div>
+        @endif
+    </div>
+</div>
+@endif
+
 <div class="row g-3">
     {{-- Recent Images --}}
     <div class="col-xl-5">

@@ -27,4 +27,14 @@ class Tenant extends Model
     {
         return $this->hasMany(MetaAdAccount::class);
     }
+
+    public function planLimits(): array
+    {
+        return config("plans.{$this->plan}", config('plans.free'));
+    }
+
+    public function adminUsers(): HasMany
+    {
+        return $this->users()->where('role', 'tenant_admin');
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\GenerateImageJob;
 use App\Models\GeneratedImage;
+use App\Services\PlanLimitService;
 use Illuminate\Http\Request;
 
 class MediaStudioController extends Controller
@@ -13,7 +14,7 @@ class MediaStudioController extends Controller
         return view('media-studio.index');
     }
 
-    public function generate(Request $request)
+    public function generate(Request $request, PlanLimitService $limits)
     {
         $request->validate([
             'topic' => 'required|string|max:500',
@@ -25,6 +26,13 @@ class MediaStudioController extends Controller
         ]);
 
         $user = $request->user();
+
+        if (! $limits->canGenerateImage($user->tenant)) {
+            $plan = $user->tenant->planLimits();
+            return response()->json([
+                'error' => "You've reached your {$plan['images_per_month']}-image monthly limit on the {$plan['name']} plan.",
+            ], 422);
+        }
 
         $image = GeneratedImage::create([
             'tenant_id' => $user->tenant_id,

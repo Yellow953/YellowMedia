@@ -12,13 +12,14 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['tenant_id', 'name', 'email', 'password', 'role'];
+    protected $fillable = ['tenant_id', 'name', 'email', 'password', 'role', 'onboarding_completed_at'];
 
     protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'email_verified_at'       => 'datetime',
+        'onboarding_completed_at' => 'datetime',
+        'password'                => 'hashed',
     ];
 
     public function tenant(): BelongsTo

@@ -196,7 +196,17 @@
 
     <div class="sidebar-footer">
         <div class="fw-semibold" style="color:#fff;font-size:.8rem;">{{ auth()->user()->name }}</div>
-        <div>{{ auth()->user()->tenant?->name ?? 'Super Admin' }}</div>
+        <div class="d-flex align-items-center justify-content-between mt-1">
+            <span>{{ auth()->user()->tenant?->name ?? 'Super Admin' }}</span>
+            @if(auth()->user()->tenant)
+                @php $plan = auth()->user()->tenant->plan; @endphp
+                <span style="font-size:.65rem;font-weight:700;padding:.2em .55em;border-radius:4px;
+                             background:{{ $plan === 'pro' ? '#F5C300' : ($plan === 'starter' ? '#3b82f6' : 'rgba(255,255,255,.15)') }};
+                             color:{{ $plan === 'pro' ? '#111' : '#fff' }};">
+                    {{ strtoupper($plan) }}
+                </span>
+            @endif
+        </div>
     </div>
 </div>
 

@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Models\Tenant;
+use App\Notifications\SyncErrorNotification;
 use App\Services\MetaAdsService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -14,16 +16,18 @@ class SyncMetaCampaignsJob implements ShouldQueue
 
     public function handle(MetaAdsService $service): void
     {
-        if ($this->tenantId) {
-            $service->syncCampaigns($this->tenantId);
+        $tenants = $this->tenantId
+            ? Tenant::where('id', $this->tenantId)->get()
+            : Tenant::where('is_active', true)->get();
 
-            return;
-        }
-
-        $tenants = \App\Models\Tenant::where('is_active', true)->pluck('id');
-
-        foreach ($tenants as $tenantId) {
-            $service->syncCampaigns($tenantId);
+        foreach ($tenants as $tenant) {
+            try {
+                $service->syncCampaigns($tenant->id);
+            } catch (\Throwable $e) {
+                $tenant->adminUsers()->each(
+                    fn($user) => $user->notify(new SyncErrorNotification('Meta Ads', $e->getMessage()))
+                );
+            }
         }
     }
 }

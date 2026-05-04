@@ -8,6 +8,7 @@ use App\Models\MetaAdAccount;
 use App\Models\MetaCampaign;
 use App\Services\GeminiTextService;
 use App\Services\MetaAdsService;
+use App\Services\PlanLimitService;
 use Illuminate\Http\Request;
 
 class CampaignBuilderController extends Controller
@@ -36,13 +37,19 @@ class CampaignBuilderController extends Controller
         return view('campaign-builder.create', compact('adAccounts', 'images'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, PlanLimitService $limits)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'objective' => 'required|string',
             'ad_account_id' => 'required|exists:meta_ad_accounts,id',
         ]);
+
+        $user = $request->user();
+        if (! $limits->canCreateCampaign($user->tenant)) {
+            $plan = $user->tenant->planLimits();
+            return back()->withErrors(['limit' => "You've reached the {$plan['max_campaigns']}-campaign limit on the {$plan['name']} plan."])->withInput();
+        }
 
         $campaign = MetaCampaign::create([
             'tenant_id' => $request->user()->tenant_id,

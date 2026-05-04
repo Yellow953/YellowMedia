@@ -2,7 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Models\AiSuggestion;
 use App\Models\MetaCampaign;
+use App\Models\User;
+use App\Notifications\AiReviewResultNotification;
 use App\Services\GeminiTextService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -23,17 +26,25 @@ class ReviewCampaignsJob implements ShouldQueue
 
         foreach ($campaigns as $campaign) {
             $payload = $campaign->load('adSets.ads')->toJson();
-            $review = $service->reviewCampaign($payload);
+            $review  = $service->reviewCampaign($payload);
 
-            // Store review results as suggestions
-            foreach ($review['actions'] ?? [] as $action) {
-                \App\Models\AiSuggestion::create([
-                    'tenant_id' => $campaign->tenant_id,
+            $actions      = $review['actions'] ?? [];
+            $highPriority = array_filter($actions, fn($a) => ($a['priority'] ?? '') === 'high');
+
+            foreach ($actions as $action) {
+                AiSuggestion::create([
+                    'tenant_id'   => $campaign->tenant_id,
                     'campaign_id' => $campaign->id,
-                    'suggestion' => $action['reason'] ?? '',
-                    'type' => 'general',
-                    'priority' => $action['priority'] ?? 'medium',
+                    'suggestion'  => $action['reason'] ?? '',
+                    'type'        => 'general',
+                    'priority'    => $action['priority'] ?? 'medium',
                 ]);
+            }
+
+            if (! empty($highPriority)) {
+                User::where('tenant_id', $campaign->tenant_id)
+                    ->where('role', 'tenant_admin')
+                    ->each(fn($u) => $u->notify(new AiReviewResultNotification($campaign, array_values($highPriority))));
             }
         }
     }

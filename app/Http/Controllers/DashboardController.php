@@ -4,20 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\GeneratedImage;
 use App\Models\MetaCampaign;
+use App\Services\PlanLimitService;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, PlanLimitService $planLimits)
     {
-        $user = $request->user();
+        $user     = $request->user();
         $tenantId = $user->tenant_id;
 
         $stats = [
             'images_generated' => GeneratedImage::where('tenant_id', $tenantId)->where('status', 'done')->count(),
             'active_campaigns' => MetaCampaign::where('tenant_id', $tenantId)->where('status', 'ACTIVE')->count(),
-            'total_spend' => MetaCampaign::where('tenant_id', $tenantId)->sum('spend'),
-            'avg_roas' => MetaCampaign::where('tenant_id', $tenantId)->avg('roas') ?? 0,
+            'total_spend'      => MetaCampaign::where('tenant_id', $tenantId)->sum('spend'),
+            'avg_roas'         => MetaCampaign::where('tenant_id', $tenantId)->avg('roas') ?? 0,
         ];
 
         $recentImages = GeneratedImage::where('tenant_id', $tenantId)
@@ -31,6 +32,8 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('dashboard.index', compact('stats', 'recentImages', 'recentCampaigns'));
+        $usage = $user->tenant ? $planLimits->usage($user->tenant) : null;
+
+        return view('dashboard.index', compact('stats', 'recentImages', 'recentCampaigns', 'usage'));
     }
 }
