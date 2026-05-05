@@ -4,169 +4,224 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Login') — YellowMedia</title>
+    <title>@yield('title', 'Sign In') — YellowMedia</title>
     <link rel="icon" type="image/png" href="/assets/images/logo.png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <style>
         :root {
-            --yellow: #F5C300;
-            --yellow-dark: #d4a900;
-            --yellow-pale: #fefce8;
-            --black: #111111;
+            --y:   #F5C300;
+            --ink: #0A0A0A;
         }
 
-        *, *::before, *::after { box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
 
         body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            margin: 0;
+            font-family: 'Barlow', sans-serif;
             display: grid;
             grid-template-columns: 1fr 1fr;
+            min-height: 100vh;
         }
 
-        /* Left panel */
+        /* ── LEFT PANEL ────────────────────────────────── */
         .auth-left {
-            background: var(--black);
+            background: var(--ink);
+            border-left: 5px solid var(--y);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 3rem;
+            padding: 2.25rem 2.25rem 2.25rem 2rem;
+            min-height: 100vh;
             position: relative;
             overflow: hidden;
         }
-        .auth-left::before {
+
+        /* subtle scanline texture */
+        .auth-left::after {
             content: '';
             position: absolute;
             inset: 0;
-            background:
-                radial-gradient(ellipse 60% 50% at 20% 80%, rgba(245,195,0,.18) 0%, transparent 70%),
-                radial-gradient(ellipse 40% 40% at 80% 20%, rgba(245,195,0,.10) 0%, transparent 70%);
+            background-image: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 3px,
+                rgba(255,255,255,.015) 3px,
+                rgba(255,255,255,.015) 4px
+            );
+            pointer-events: none;
         }
+
         .auth-left > * { position: relative; z-index: 1; }
 
-        .brand-mark {
-            display: flex;
-            align-items: center;
-            gap: .75rem;
-        }
-        .brand-icon {
-            width: 40px; height: 40px;
-            background: var(--yellow);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; color: var(--black); font-weight: 800;
-        }
-        .brand-name { font-size: 1.1rem; font-weight: 700; color: #fff; letter-spacing: -.3px; }
+        /* logo */
+        .left-logo img { width: 140px; height: auto; }
 
-        .auth-headline {
-            color: #fff;
-        }
-        .auth-headline h1 {
-            font-size: 2.6rem;
-            font-weight: 800;
-            line-height: 1.15;
-            letter-spacing: -.04em;
-            margin-bottom: 1rem;
-        }
-        .auth-headline h1 em {
-            font-style: normal;
-            color: var(--yellow);
-        }
-        .auth-headline p {
-            font-size: .9375rem;
-            color: rgba(255,255,255,.55);
-            line-height: 1.6;
-            max-width: 340px;
-        }
-
-        .feature-list {
+        /* headline block */
+        .left-main {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: .75rem;
+            justify-content: center;
+            padding: 1.5rem 0;
         }
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: .75rem;
-            font-size: .8125rem;
-            color: rgba(255,255,255,.6);
+        .left-eyebrow {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--y);
+            margin-bottom: .75rem;
         }
-        .feature-dot {
-            width: 28px; height: 28px;
-            background: rgba(245,195,0,.12);
-            border-radius: 7px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--yellow);
-            font-size: .8rem;
-            flex-shrink: 0;
+        .left-headline {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 3.25rem;
+            font-weight: 800;
+            line-height: .97;
+            letter-spacing: -.01em;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+        .left-headline span { color: var(--y); }
+        .left-tagline {
+            font-size: .875rem;
+            font-weight: 400;
+            color: rgba(255,255,255,.38);
+            line-height: 1.6;
         }
 
-        /* Right panel */
-        .auth-right {
-            background: #fff;
+        /* feature rows */
+        .feature-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border-top: 1px solid rgba(255,255,255,.08);
+        }
+        .feature-row {
+            display: flex;
+            align-items: flex-start;
+            gap: .875rem;
+            padding: .875rem 0;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .feature-icon {
+            width: 30px;
+            height: 30px;
+            background: rgba(245,195,0,.1);
+            border-radius: 7px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 3rem 2rem;
+            color: var(--y);
+            font-size: .8rem;
+            flex-shrink: 0;
+            margin-top: 1px;
         }
-
-        .auth-form-wrap {
-            width: 100%;
-            max-width: 380px;
-        }
-
-        .auth-form-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--black);
-            margin-bottom: .375rem;
-            letter-spacing: -.03em;
-        }
-        .auth-form-sub {
-            font-size: .875rem;
-            color: #6b7280;
-            margin-bottom: 2rem;
-        }
-
-        .form-label {
+        .feature-text strong {
+            display: block;
             font-size: .8125rem;
             font-weight: 600;
-            color: #374151;
-            margin-bottom: .375rem;
+            color: rgba(255,255,255,.85);
+            margin-bottom: .1rem;
         }
-        .form-control {
-            font-size: .875rem;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 8px;
-            padding: .6rem .875rem;
-            color: var(--black);
-            transition: border-color .15s, box-shadow .15s;
+        .feature-text span {
+            font-size: .75rem;
+            color: rgba(255,255,255,.35);
+            line-height: 1.4;
         }
-        .form-control:focus {
-            border-color: var(--yellow);
-            box-shadow: 0 0 0 3px rgba(245,195,0,.15);
-            outline: none;
-        }
-        .form-control.is-invalid { border-color: #ef4444; }
-        .form-control.is-invalid:focus { box-shadow: 0 0 0 3px rgba(239,68,68,.12); }
 
-        .input-icon-wrap { position: relative; }
-        .input-icon-wrap .input-icon {
+        /* ── RIGHT PANEL ───────────────────────────────── */
+        .auth-right {
+            background: #F9F9F7;
+            display: flex;
+            flex-direction: column;
+        }
+        .auth-right-top-bar {
+            height: 4px;
+            background: var(--y);
+            flex-shrink: 0;
+        }
+        .auth-right-inner {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2.5rem;
+        }
+        .auth-form-wrap { width: 100%; max-width: 360px; }
+        .auth-footer {
+            text-align: center;
+            font-size: .7rem;
+            color: #BFC3CC;
+            padding: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        /* ── FORM ELEMENTS ─────────────────────────────── */
+        .form-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -.01em;
+            text-transform: uppercase;
+            color: var(--ink);
+            margin-bottom: .25rem;
+        }
+        .form-sub {
+            font-size: .875rem;
+            color: #6B7280;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .field-group { margin-bottom: 1.25rem; }
+        .field-label {
+            display: block;
+            font-size: .7rem;
+            font-weight: 600;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: #374151;
+            margin-bottom: .5rem;
+        }
+        .field-inner { position: relative; }
+        .field-icon {
             position: absolute;
-            left: .875rem;
+            left: .9rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #9ca3af;
-            font-size: .9rem;
+            color: #B0B7C3;
+            font-size: .875rem;
             pointer-events: none;
+            z-index: 1;
         }
-        .input-icon-wrap .form-control { padding-left: 2.5rem; }
-        .input-icon-wrap .toggle-pass {
+        .field-input {
+            width: 100%;
+            padding: .72rem .875rem .72rem 2.45rem;
+            font-size: .9rem;
+            font-family: 'Barlow', sans-serif;
+            font-weight: 500;
+            color: var(--ink);
+            background: #fff;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 9px;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+            -webkit-appearance: none;
+        }
+        .field-input::placeholder { color: #C4C9D4; font-weight: 400; }
+        .field-input:focus {
+            border-color: var(--y);
+            box-shadow: 0 0 0 3.5px rgba(245,195,0,.18);
+        }
+        .field-input.is-error { border-color: #EF4444; }
+        .field-input.is-error:focus { box-shadow: 0 0 0 3.5px rgba(239,68,68,.12); }
+
+        .toggle-pass {
             position: absolute;
             right: .875rem;
             top: 50%;
@@ -174,101 +229,163 @@
             background: none;
             border: none;
             padding: 0;
-            color: #9ca3af;
             cursor: pointer;
-            font-size: .9rem;
-            line-height: 1;
-        }
-        .input-icon-wrap .toggle-pass:hover { color: #374151; }
-
-        .btn-signin {
-            width: 100%;
-            padding: .7rem;
-            background: var(--black);
-            color: #fff;
+            color: #B0B7C3;
             font-size: .875rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background .15s, transform .1s;
-            display: flex; align-items: center; justify-content: center; gap: .5rem;
+            line-height: 1;
+            z-index: 1;
         }
-        .btn-signin:hover { background: #1f2937; }
-        .btn-signin:active { transform: scale(.98); }
+        .toggle-pass:hover { color: #374151; }
 
-        .divider {
-            display: flex; align-items: center; gap: .75rem;
-            font-size: .75rem; color: #d1d5db; margin: 1.25rem 0;
-        }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
-
-        .remember-row {
+        .row-split {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
         }
-        .remember-row .form-check { margin: 0; }
-        .form-check-input:checked {
-            background-color: var(--yellow);
-            border-color: var(--yellow);
+        .check-label {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            cursor: pointer;
         }
-        .form-check-input:focus { box-shadow: 0 0 0 3px rgba(245,195,0,.2); border-color: var(--yellow); }
-        .form-check-label { font-size: .8125rem; color: #374151; cursor: pointer; }
+        .check-box {
+            width: 16px; height: 16px;
+            border: 1.5px solid #D1D5DB;
+            border-radius: 5px;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: background .15s, border-color .15s;
+        }
+        .check-box:checked { background: var(--y); border-color: var(--y); }
+        .check-box:checked::after {
+            content: '';
+            position: absolute;
+            top: 1.5px; left: 4px;
+            width: 5px; height: 8px;
+            border: 2px solid var(--ink);
+            border-top: none; border-left: none;
+            transform: rotate(45deg);
+        }
+        .check-text { font-size: .8125rem; font-weight: 500; color: #4B5563; }
 
         .forgot-link {
             font-size: .8125rem;
-            color: #6b7280;
+            font-weight: 600;
+            color: #6B7280;
             text-decoration: none;
-            font-weight: 500;
         }
-        .forgot-link:hover { color: var(--black); }
+        .forgot-link:hover { color: var(--ink); }
 
-        /* Responsive */
+        .btn-submit {
+            width: 100%;
+            padding: .8rem 1.25rem;
+            background: var(--y);
+            color: var(--ink);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            transition: background .15s, box-shadow .15s, transform .1s;
+        }
+        .btn-submit:hover {
+            background: #E8B800;
+            box-shadow: 0 4px 20px rgba(245,195,0,.4);
+        }
+        .btn-submit:active { transform: scale(.98); }
+
+        .error-alert {
+            display: flex;
+            align-items: center;
+            gap: .625rem;
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: #DC2626;
+            border-radius: 9px;
+            padding: .7rem 1rem;
+            font-size: .8125rem;
+            font-weight: 500;
+            margin-bottom: 1.25rem;
+        }
+
+        /* ── RESPONSIVE ────────────────────────────────── */
         @media (max-width: 768px) {
             body { grid-template-columns: 1fr; }
             .auth-left { display: none; }
-            .auth-right { padding: 2rem 1.25rem; align-items: flex-start; padding-top: 4rem; }
+            .auth-right { min-height: 100vh; }
+            .auth-right-inner {
+                padding: 2rem 1.5rem;
+                align-items: flex-start;
+                padding-top: 4rem;
+            }
         }
     </style>
 </head>
 <body>
 
+<!-- ── LEFT PANEL ─────────────────────────────────────────── -->
 <div class="auth-left">
-    <div class="brand-mark">
-        <img src="/assets/images/logo.png" alt="YellowMedia" style="width: 180px; height: auto;">
+
+    <div class="left-logo">
+        <img src="/assets/images/logo.png" alt="YellowMedia">
     </div>
 
-    <div class="auth-headline">
-        <h1>Grow smarter.<br>Post <em>faster.</em></h1>
-        <p>AI-generated visuals and Meta Ads intelligence — all in one dashboard built for modern teams.</p>
+    <div class="left-main">
+        <div class="left-eyebrow">AI-Powered Media Platform</div>
+        <div class="left-headline">
+            Create.<br>Publish.<br><span>Optimize.</span>
+        </div>
+        <div class="left-tagline">
+            AI-generated visuals and Meta Ads intelligence for teams that move fast.
+        </div>
     </div>
 
-    <div class="feature-list">
-        <div class="feature-item">
-            <div class="feature-dot"><i class="bi bi-magic"></i></div>
-            AI image generation for social media
+    <div class="feature-rows">
+        <div class="feature-row">
+            <div class="feature-icon"><i class="bi bi-magic"></i></div>
+            <div class="feature-text">
+                <strong>AI Image Generation</strong>
+                <span>Social posts, stories and banners in seconds</span>
+            </div>
         </div>
-        <div class="feature-item">
-            <div class="feature-dot"><i class="bi bi-bar-chart-line"></i></div>
-            Real-time Meta Ads performance monitor
+        <div class="feature-row">
+            <div class="feature-icon"><i class="bi bi-bar-chart-line"></i></div>
+            <div class="feature-text">
+                <strong>Meta Ads Monitor</strong>
+                <span>Live campaign metrics with AI-driven suggestions</span>
+            </div>
         </div>
-        <div class="feature-item">
-            <div class="feature-dot"><i class="bi bi-lightbulb"></i></div>
-            AI-driven campaign optimization suggestions
-        </div>
-        <div class="feature-item">
-            <div class="feature-dot"><i class="bi bi-building"></i></div>
-            Multi-tenant — built for agencies &amp; teams
+        <div class="feature-row">
+            <div class="feature-icon"><i class="bi bi-send"></i></div>
+            <div class="feature-text">
+                <strong>Campaign Builder</strong>
+                <span>Build and launch complete Meta campaigns from one place</span>
+            </div>
         </div>
     </div>
+
 </div>
 
+<!-- ── RIGHT PANEL ────────────────────────────────────────── -->
 <div class="auth-right">
-    <div class="auth-form-wrap">
-        @yield('content')
+    <div class="auth-right-top-bar"></div>
+    <div class="auth-right-inner">
+        <div class="auth-form-wrap">
+            @yield('content')
+        </div>
     </div>
+    <div class="auth-footer">© {{ date('Y') }} YellowMedia · AI-Powered Media Studio</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

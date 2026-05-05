@@ -1,65 +1,82 @@
-@extends('layouts.app')
+@extends('layouts.auth')
+
+@section('title', 'Set New Password')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('password.update') }}">
-                        @csrf
+<div class="form-title">Set new password</div>
+<div class="form-sub">Choose a strong password for your account</div>
 
-                        <input type="hidden" name="token" value="{{ $token }}">
+@if($errors->any())
+    <div class="error-alert">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        {{ $errors->first() }}
+    </div>
+@endif
 
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+<form method="POST" action="{{ route('password.update') }}" novalidate>
+    @csrf
+    <input type="hidden" name="token" value="{{ $token }}">
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Reset Password') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <div class="field-group">
+        <label class="field-label" for="email">Email address</label>
+        <div class="field-inner">
+            <i class="bi bi-envelope field-icon"></i>
+            <input type="email" id="email" name="email"
+                   class="field-input {{ $errors->has('email') ? 'is-error' : '' }}"
+                   value="{{ $email ?? old('email') }}"
+                   placeholder="you@company.com"
+                   required autocomplete="email" autofocus>
         </div>
     </div>
-</div>
+
+    <div class="field-group">
+        <label class="field-label" for="password">New password</label>
+        <div class="field-inner">
+            <i class="bi bi-lock field-icon"></i>
+            <input type="password" id="password" name="password"
+                   class="field-input {{ $errors->has('password') ? 'is-error' : '' }}"
+                   placeholder="••••••••"
+                   required autocomplete="new-password">
+            <button type="button" class="toggle-pass" onclick="togglePassword('password','icon1')">
+                <i class="bi bi-eye" id="icon1"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="field-group">
+        <label class="field-label" for="password-confirm">Confirm password</label>
+        <div class="field-inner">
+            <i class="bi bi-lock field-icon"></i>
+            <input type="password" id="password-confirm" name="password_confirmation"
+                   class="field-input"
+                   placeholder="••••••••"
+                   required autocomplete="new-password">
+            <button type="button" class="toggle-pass" onclick="togglePassword('password-confirm','icon2')">
+                <i class="bi bi-eye" id="icon2"></i>
+            </button>
+        </div>
+    </div>
+
+    <button type="submit" class="btn-submit">
+        Reset Password <i class="bi bi-arrow-right"></i>
+    </button>
+</form>
+
+@push('scripts')
+<script>
+function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+</script>
+@endpush
+
 @endsection

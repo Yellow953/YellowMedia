@@ -170,7 +170,7 @@
             <i class="bi bi-plug"></i> Ad Accounts
         </a>
 
-        @if(auth()->user()->isSuperAdmin())
+        @if(auth()->check() && auth()->user()->isSuperAdmin())
         <div class="sidebar-section-title">Admin</div>
         <a href="{{ route('admin.tenants.index') }}" class="nav-link {{ request()->routeIs('admin.tenants.*') ? 'active' : '' }}">
             <i class="bi bi-building"></i> Tenants
