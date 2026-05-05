@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes(['register' => false]);
 
+Route::get('/', fn () => auth()->check() ? redirect()->route('dashboard') : view('welcome'))->name('home');
+
 Route::middleware(['auth', 'scope.tenant'])->group(function () {
 
     // Onboarding — excluded from check.onboarding so new users can reach it
@@ -25,7 +27,7 @@ Route::middleware(['auth', 'scope.tenant'])->group(function () {
 
     Route::middleware('check.onboarding')->group(function () {
 
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Media Studio
         Route::prefix('media-studio')->name('media.')->group(function () {

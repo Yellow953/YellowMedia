@@ -7,7 +7,7 @@
     <title>@yield('title', 'Sign In') — YellowMedia</title>
     <link rel="icon" type="image/png" href="/assets/images/logo.png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
@@ -21,7 +21,7 @@
         html, body { height: 100%; }
 
         body {
-            font-family: 'Barlow', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             display: grid;
             grid-template-columns: 1fr 1fr;
             min-height: 100vh;
@@ -68,21 +68,18 @@
             padding: 1.5rem 0;
         }
         .left-eyebrow {
-            font-family: 'Barlow Condensed', sans-serif;
             font-size: .7rem;
-            font-weight: 700;
-            letter-spacing: .14em;
+            font-weight: 600;
+            letter-spacing: .1em;
             text-transform: uppercase;
             color: var(--y);
-            margin-bottom: .75rem;
+            margin-bottom: .875rem;
         }
         .left-headline {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 3.25rem;
+            font-size: 2.375rem;
             font-weight: 800;
-            line-height: .97;
-            letter-spacing: -.01em;
-            text-transform: uppercase;
+            line-height: 1.15;
+            letter-spacing: -.03em;
             color: #fff;
             margin-bottom: 1rem;
         }
@@ -163,11 +160,9 @@
 
         /* ── FORM ELEMENTS ─────────────────────────────── */
         .form-title {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 800;
-            letter-spacing: -.01em;
-            text-transform: uppercase;
+            letter-spacing: -.03em;
             color: var(--ink);
             margin-bottom: .25rem;
         }
@@ -203,7 +198,7 @@
             width: 100%;
             padding: .72rem .875rem .72rem 2.45rem;
             font-size: .9rem;
-            font-family: 'Barlow', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 500;
             color: var(--ink);
             background: #fff;
@@ -285,11 +280,9 @@
             padding: .8rem 1.25rem;
             background: var(--y);
             color: var(--ink);
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 1rem;
+            font-size: .9375rem;
             font-weight: 700;
-            letter-spacing: .04em;
-            text-transform: uppercase;
+            letter-spacing: -.01em;
             border: none;
             border-radius: 9px;
             cursor: pointer;
@@ -344,7 +337,7 @@
     <div class="left-main">
         <div class="left-eyebrow">AI-Powered Media Platform</div>
         <div class="left-headline">
-            Create.<br>Publish.<br><span>Optimize.</span>
+            Smarter ads.<br>Faster <span>content.</span>
         </div>
         <div class="left-tagline">
             AI-generated visuals and Meta Ads intelligence for teams that move fast.
