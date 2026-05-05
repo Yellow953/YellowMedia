@@ -84,7 +84,7 @@
 <div class="row g-4">
 
     {{-- Left nav --}}
-    <div class="col-md-3 col-lg-2">
+    <div class="col-md-3">
         <div class="card p-2">
             <nav class="settings-nav d-flex flex-column gap-1">
                 <div class="section-label">Account</div>
@@ -98,6 +98,13 @@
                 </a>
 
                 <div class="section-label mt-1">Workspace</div>
+                <a href="?tab=brand"
+                   class="nav-link {{ $activeTab === 'brand' ? 'active' : '' }}">
+                    <i class="bi bi-palette"></i> Brand Profile
+                    @if(!$brandProfile?->hasVoice())
+                        <span class="badge ms-auto" style="background:#fef3c7;color:#92400e;font-size:.65rem;">Setup</span>
+                    @endif
+                </a>
                 <a href="?tab=connections"
                    class="nav-link {{ $activeTab === 'connections' ? 'active' : '' }}">
                     <i class="bi bi-plug"></i> Connections
@@ -114,7 +121,7 @@
     </div>
 
     {{-- Right panels --}}
-    <div class="col-md-9 col-lg-10">
+    <div class="col-md-9">
 
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show mb-3 d-flex align-items-center gap-2">
@@ -129,7 +136,7 @@
                 <div class="card-header py-3 px-4 d-flex align-items-center gap-2">
                     <i class="bi bi-person text-muted"></i> Profile
                 </div>
-                <div class="card-body p-4" style="max-width:520px;">
+                <div class="card-body p-4">
                     <form method="POST" action="{{ route('settings.profile.update') }}">
                         @csrf @method('PUT')
                         <div class="mb-4">
@@ -170,7 +177,7 @@
                 <div class="card-header py-3 px-4 d-flex align-items-center gap-2">
                     <i class="bi bi-shield-lock text-muted"></i> Security
                 </div>
-                <div class="card-body p-4" style="max-width:520px;">
+                <div class="card-body p-4">
                     <form method="POST" action="{{ route('settings.password.update') }}">
                         @csrf @method('PUT')
                         <div class="mb-3">
@@ -191,6 +198,128 @@
                         </div>
                         <div class="pt-2 border-top d-flex justify-content-end">
                             <button type="submit" class="btn btn-yellow px-4">Update Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- Brand Profile --}}
+        <div class="settings-panel {{ $activeTab === 'brand' ? 'active' : '' }}">
+            <div class="card">
+                <div class="card-header py-3 px-4 d-flex align-items-center gap-2">
+                    <i class="bi bi-palette text-muted"></i> Brand Profile
+                    <span class="ms-auto text-muted small">Used by AI when generating images and captions</span>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ route('settings.brand.save') }}">
+                        @csrf @method('PUT')
+
+                        <div class="row g-4">
+                            {{-- Left column --}}
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size:.875rem;">Business Name</label>
+                                    <input type="text" name="business_name" class="form-control"
+                                           value="{{ old('business_name', $brandProfile?->business_name) }}"
+                                           placeholder="e.g. YellowPOS">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size:.875rem;">Business Description</label>
+                                    <textarea name="business_description" class="form-control" rows="3"
+                                              placeholder="What does your business do? Who do you serve?">{{ old('business_description', $brandProfile?->business_description) }}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size:.875rem;">Target Audience</label>
+                                    <input type="text" name="target_audience" class="form-control"
+                                           value="{{ old('target_audience', $brandProfile?->target_audience) }}"
+                                           placeholder="e.g. Restaurant owners and retail merchants in Lebanon">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size:.875rem;">Tone</label>
+                                    <select name="tone" class="form-select">
+                                        @foreach(['professional','casual','friendly','bold','inspiring'] as $t)
+                                            <option value="{{ $t }}" {{ old('tone', $brandProfile?->tone) === $t ? 'selected' : '' }}>
+                                                {{ ucfirst($t) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size:.875rem;">Brand Colors</label>
+                                    <input type="text" name="brand_colors" class="form-control"
+                                           value="{{ old('brand_colors', $brandProfile?->brand_colors) }}"
+                                           placeholder="e.g. Yellow #F5C300 and Black #111111">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size:.875rem;">Instagram Handle</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">@</span>
+                                        <input type="text" name="instagram_handle" class="form-control"
+                                               value="{{ old('instagram_handle', $brandProfile?->instagram_handle) }}"
+                                               placeholder="yellowpos_com">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size:.875rem;">Content Pillars <span class="text-muted fw-normal">(comma-separated)</span></label>
+                                    <input type="text" name="content_pillars" class="form-control"
+                                           value="{{ old('content_pillars', $brandProfile?->content_pillars ? implode(', ', $brandProfile->content_pillars) : '') }}"
+                                           placeholder="e.g. product features, success stories, tips, promotions">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size:.875rem;">Default Hashtags</label>
+                                    <textarea name="hashtags" class="form-control" rows="2"
+                                              placeholder="#YellowPOS #POS #Lebanon">{{ old('hashtags', $brandProfile?->hashtags) }}</textarea>
+                                </div>
+                            </div>
+
+                            {{-- Right column — Voice --}}
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size:.875rem;">Sample Captions
+                                        <span class="text-muted fw-normal">(paste 3–5 of your best posts)</span>
+                                    </label>
+                                    <textarea name="sample_captions" id="sampleCaptions" class="form-control" rows="8"
+                                              placeholder="Paste your existing Instagram/Facebook captions here. The more examples you give, the better the AI learns your voice.">{{ old('sample_captions', $brandProfile?->sample_captions) }}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <button type="button" id="analyzeVoiceBtn" class="btn btn-outline-secondary btn-sm w-100">
+                                        <i class="bi bi-magic me-1"></i> Analyze Voice with AI
+                                    </button>
+                                    <div id="analyzeSpinner" class="text-center mt-2 d-none">
+                                        <div class="spinner-border spinner-border-sm text-muted" role="status"></div>
+                                        <span class="small text-muted ms-2">Analyzing your writing style...</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size:.875rem;">
+                                        Brand Voice Summary
+                                        <span class="text-muted fw-normal">(AI-generated, editable)</span>
+                                    </label>
+                                    <textarea name="voice_summary" id="voiceSummary" class="form-control" rows="6"
+                                              placeholder="Click 'Analyze Voice' to auto-generate, or write your own description of your brand's writing style.">{{ old('voice_summary', $brandProfile?->voice_summary) }}</textarea>
+                                    @if($brandProfile?->hasVoice())
+                                        <div class="form-text text-success">
+                                            <i class="bi bi-check-circle me-1"></i> Voice profile active — all AI generations use this context
+                                        </div>
+                                    @else
+                                        <div class="form-text">Once set, this context is injected into every image and caption the AI generates.</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-top d-flex justify-content-end">
+                            <button type="submit" class="btn btn-yellow px-4">Save Brand Profile</button>
                         </div>
                     </form>
                 </div>
@@ -324,3 +453,41 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.getElementById('analyzeVoiceBtn')?.addEventListener('click', async function() {
+    const captions = document.getElementById('sampleCaptions').value.trim();
+    if (captions.length < 50) {
+        alert('Please paste at least a few captions before analyzing.');
+        return;
+    }
+
+    this.disabled = true;
+    document.getElementById('analyzeSpinner').classList.remove('d-none');
+
+    try {
+        const res = await fetch('{{ route("settings.brand.analyze") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({
+                sample_captions: captions,
+                business_name: document.querySelector('[name="business_name"]')?.value || '',
+            }),
+        });
+        const data = await res.json();
+        if (data.voice_summary) {
+            document.getElementById('voiceSummary').value = data.voice_summary;
+        }
+    } catch (e) {
+        alert('Analysis failed. Please try again.');
+    } finally {
+        this.disabled = false;
+        document.getElementById('analyzeSpinner').classList.add('d-none');
+    }
+});
+</script>
+@endpush

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard') — YellowMedia</title>
+    <link rel="icon" type="image/png" href="/assets/images/logo.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -31,20 +32,7 @@
             z-index: 1000;
         }
         .sidebar-brand {
-            padding: 1.25rem 1.5rem;
             border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        .sidebar-brand .logo-text {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--yellow);
-            letter-spacing: -0.5px;
-        }
-        .sidebar-brand .logo-sub {
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.4);
-            display: block;
-            margin-top: -2px;
         }
         .sidebar-nav { padding: 1rem 0; flex: 1; }
         .sidebar-section-title {
@@ -149,9 +137,8 @@
 <body>
 
 <div id="sidebar">
-    <div class="sidebar-brand">
-        <div class="logo-text">YellowMedia</div>
-        <span class="logo-sub">Social Media Suite</span>
+    <div class="sidebar-brand" style="padding: 1rem 1.25rem;">
+        <img src="/assets/images/logo.png" alt="YellowMedia" style="width: 150px; height: auto; display: block;">
     </div>
 
     <nav class="sidebar-nav">

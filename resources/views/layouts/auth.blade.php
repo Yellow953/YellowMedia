@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Login') — YellowMedia</title>
+    <link rel="icon" type="image/png" href="/assets/images/logo.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -236,8 +237,7 @@
 
 <div class="auth-left">
     <div class="brand-mark">
-        <div class="brand-icon">Y</div>
-        <span class="brand-name">YellowMedia</span>
+        <img src="/assets/images/logo.png" alt="YellowMedia" style="width: 180px; height: auto;">
     </div>
 
     <div class="auth-headline">

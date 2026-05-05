@@ -64,6 +64,8 @@ Route::middleware(['auth', 'scope.tenant'])->group(function () {
             Route::get('/', [SettingsController::class, 'index'])->name('index');
             Route::put('/profile', [SettingsController::class, 'updateProfile'])->name('profile.update');
             Route::put('/password', [SettingsController::class, 'updatePassword'])->name('password.update');
+            Route::put('/brand', [SettingsController::class, 'saveBrandProfile'])->name('brand.save');
+            Route::post('/brand/analyze-voice', [SettingsController::class, 'analyzeVoice'])->name('brand.analyze');
             Route::get('/ad-accounts', [SettingsController::class, 'adAccounts'])->name('ad-accounts');
             Route::delete('/ad-accounts/{id}', [SettingsController::class, 'removeAdAccount'])->name('ad-accounts.remove');
         });

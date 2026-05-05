@@ -29,5 +29,7 @@ class DatabaseSeeder extends Seeder
                 'tenant_id' => $tenant->id,
             ]
         );
+
+        $this->call(BrandProfileSeeder::class);
     }
 }

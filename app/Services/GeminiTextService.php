@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\BrandProfile;
 use Illuminate\Support\Facades\Http;
 
 class GeminiTextService
@@ -13,6 +14,42 @@ class GeminiTextService
     {
         $this->apiKey = config('services.google.api_key');
         $this->model = config('services.google.text_model', 'gemini-2.0-flash');
+    }
+
+    public function generatePostCaption(string $topic, string $format, string $language, ?BrandProfile $brandProfile = null): string
+    {
+        $brandContext = $brandProfile ? $brandProfile->brandContext() : '';
+        $hashtagLine = $brandProfile?->hashtags ? "Include these hashtags: {$brandProfile->hashtags}" : 'Include relevant hashtags.';
+
+        $prompt = "Write a social media caption for a {$format} post.
+Topic: {$topic}
+Language: {$language}
+{$brandContext}
+
+Requirements:
+- Ready to post directly on Instagram/Facebook
+- Include relevant emojis
+- End with a clear call to action
+- {$hashtagLine}
+- Output ONLY the caption text, nothing else, no explanations";
+
+        return $this->ask($prompt) ?? '';
+    }
+
+    public function analyzeVoice(string $sampleCaptions, string $businessName): string
+    {
+        $prompt = "Analyze these social media captions from {$businessName} and write a concise brand voice summary (3-4 sentences) that captures:
+- The tone and personality
+- How they address their audience
+- Common patterns, phrases, or styles
+- Emoji usage and hashtag style
+
+Sample captions:
+{$sampleCaptions}
+
+Output ONLY the brand voice summary, nothing else.";
+
+        return $this->ask($prompt) ?? '';
     }
 
     public function generateCaption(string $businessName, string $topic, string $objective, string $tone, string $language): string

@@ -4,6 +4,11 @@
 @section('page-title', 'Media Studio')
 
 @section('topbar-actions')
+    @if(!$brandProfile?->hasVoice())
+        <a href="{{ route('settings.index', ['tab' => 'brand']) }}" class="btn btn-outline-warning btn-sm me-2">
+            <i class="bi bi-palette me-1"></i> Set up Brand Profile
+        </a>
+    @endif
     <a href="{{ route('media.library') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-images me-1"></i> Library
     </a>
@@ -29,7 +34,8 @@
                         <div class="col-6">
                             <label class="form-label fw-semibold">Format</label>
                             <select name="format" id="format" class="form-select">
-                                <option value="post">Post (1:1)</option>
+                                <option value="post" selected>Instagram (4:5)</option>
+                                <option value="square">Square (1:1)</option>
                                 <option value="story">Story (9:16)</option>
                                 <option value="banner">Banner (16:9)</option>
                             </select>
@@ -94,7 +100,22 @@
 
                 {{-- Result state --}}
                 <div id="resultState" class="d-none w-100">
-                    <img id="resultImage" src="" alt="Generated image" class="img-fluid rounded mx-auto d-block" style="max-height:500px;">
+                    <img id="resultImage" src="" alt="Generated image" class="img-fluid rounded mx-auto d-block" style="max-height:420px;">
+
+                    {{-- Caption box --}}
+                    <div id="captionBox" class="d-none mt-3">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="fw-semibold" style="font-size:.8rem;color:#4b5563;">
+                                <i class="bi bi-chat-quote me-1"></i> Generated Caption
+                            </span>
+                            <button type="button" id="copyCaptionBtn" class="btn btn-outline-secondary btn-sm" style="font-size:.75rem;padding:.2rem .6rem;">
+                                <i class="bi bi-copy me-1"></i> Copy
+                            </button>
+                        </div>
+                        <div id="captionText" class="p-3 rounded"
+                             style="background:#f9fafb;border:1px solid #e5e7eb;font-size:.875rem;line-height:1.6;white-space:pre-wrap;max-height:160px;overflow-y:auto;"></div>
+                    </div>
+
                     <div class="d-flex gap-2 justify-content-center mt-3">
                         <a id="downloadBtn" href="#" download class="btn btn-yellow btn-sm">
                             <i class="bi bi-download me-1"></i> Download
@@ -167,6 +188,12 @@ function startPolling(id) {
                 clearInterval(pollingInterval);
                 document.getElementById('resultImage').src = data.url;
                 document.getElementById('downloadBtn').href = data.url;
+
+                if (data.caption) {
+                    document.getElementById('captionText').textContent = data.caption;
+                    document.getElementById('captionBox').classList.remove('d-none');
+                }
+
                 showState('result');
             } else if (data.status === 'failed') {
                 clearInterval(pollingInterval);
@@ -190,7 +217,17 @@ function showState(state) {
 
 function resetForm() {
     if (pollingInterval) clearInterval(pollingInterval);
+    document.getElementById('captionBox').classList.add('d-none');
+    document.getElementById('captionText').textContent = '';
     showState('idle');
 }
+
+document.getElementById('copyCaptionBtn')?.addEventListener('click', function() {
+    const text = document.getElementById('captionText').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        this.innerHTML = '<i class="bi bi-check me-1"></i> Copied!';
+        setTimeout(() => { this.innerHTML = '<i class="bi bi-copy me-1"></i> Copy'; }, 2000);
+    });
+});
 </script>
 @endpush

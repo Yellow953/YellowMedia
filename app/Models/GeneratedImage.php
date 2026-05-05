@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class GeneratedImage extends Model
 {
     protected $fillable = [
-        'tenant_id', 'user_id', 'prompt', 'revised_prompt',
+        'tenant_id', 'user_id', 'prompt', 'revised_prompt', 'caption',
         'format', 'size', 'file_path', 'google_generation_id', 'status',
     ];
 

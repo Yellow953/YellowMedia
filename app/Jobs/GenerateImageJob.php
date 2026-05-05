@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Models\BrandProfile;
 use App\Models\GeneratedImage;
 use App\Services\GeminiImageService;
+use App\Services\GeminiTextService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -19,16 +21,26 @@ class GenerateImageJob implements ShouldQueue
         private readonly array $params
     ) {}
 
-    public function handle(GeminiImageService $service): void
+    public function handle(GeminiImageService $imageService, GeminiTextService $textService): void
     {
-        $prompt = $service->buildPrompt($this->params);
-        $path = $service->generate($prompt, (string) $this->image->tenant_id, $this->params['format'] ?? 'post');
+        $brandProfile = BrandProfile::where('tenant_id', $this->image->tenant_id)->first();
+
+        $prompt = $imageService->buildPrompt($this->params, $brandProfile);
+        $path = $imageService->generate($prompt, (string) $this->image->tenant_id, $this->params['format'] ?? 'post');
 
         if ($path) {
+            $caption = $textService->generatePostCaption(
+                $this->params['topic'] ?? '',
+                $this->params['format'] ?? 'post',
+                $this->params['language'] ?? 'English',
+                $brandProfile
+            );
+
             $this->image->update([
                 'revised_prompt' => $prompt,
-                'file_path' => $path,
-                'status' => 'done',
+                'file_path'      => $path,
+                'caption'        => $caption,
+                'status'         => 'done',
             ]);
         } else {
             $this->image->update(['status' => 'failed']);

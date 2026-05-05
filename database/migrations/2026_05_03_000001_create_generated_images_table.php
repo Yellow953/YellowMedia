@@ -14,7 +14,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->text('prompt');
             $table->text('revised_prompt')->nullable();
-            $table->enum('format', ['post', 'story', 'banner'])->default('post');
+            $table->text('caption')->nullable();
+            $table->enum('format', ['post', 'square', 'story', 'banner'])->default('post');
             $table->string('size')->nullable();
             $table->string('file_path')->nullable();
             $table->string('google_generation_id')->nullable();
