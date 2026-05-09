@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AiActionLog extends Model
 {
+    protected $table = 'ai_action_log';
+
     public $timestamps = false;
 
     protected $fillable = [

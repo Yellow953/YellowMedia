@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\MetaCampaign;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class MetaAdsService
 {
@@ -22,7 +23,16 @@ class MetaAdsService
             $response = Http::get("{$this->apiBase}/act_{$accountId}/campaigns", [
                 'fields' => 'id,name,status,objective,daily_budget,lifetime_budget',
                 'access_token' => $token,
+                'limit' => 100,
             ]);
+
+            if ($response->failed()) {
+                Log::error("MetaAdsService: campaigns API error for account {$accountId}", [
+                    'status' => $response->status(),
+                    'body'   => $response->body(),
+                ]);
+                continue;
+            }
 
             foreach ($response->json('data') ?? [] as $c) {
                 $campaign = MetaCampaign::updateOrCreate(
@@ -49,19 +59,30 @@ class MetaAdsService
             'access_token' => $token,
         ]);
 
+        if ($response->failed()) {
+            Log::warning("MetaAdsService: insights API error for campaign {$campaign->campaign_id}", [
+                'status' => $response->status(),
+                'body'   => $response->body(),
+            ]);
+            return;
+        }
+
         $data = $response->json('data.0') ?? [];
 
+        $updates = ['last_synced_at' => now()];
+
         if (! empty($data)) {
-            $campaign->update([
-                'spend' => $data['spend'] ?? 0,
+            $updates += [
+                'spend'       => $data['spend'] ?? 0,
                 'impressions' => $data['impressions'] ?? 0,
-                'clicks' => $data['clicks'] ?? 0,
-                'ctr' => $data['ctr'] ?? 0,
-                'cpc' => $data['cpc'] ?? 0,
-                'roas' => $data['purchase_roas'][0]['value'] ?? 0,
-                'last_synced_at' => now(),
-            ]);
+                'clicks'      => $data['clicks'] ?? 0,
+                'ctr'         => $data['ctr'] ?? 0,
+                'cpc'         => $data['cpc'] ?? 0,
+                'roas'        => $data['purchase_roas'][0]['value'] ?? 0,
+            ];
         }
+
+        $campaign->update($updates);
     }
 
     public function launchCampaign(MetaCampaign $campaign): void

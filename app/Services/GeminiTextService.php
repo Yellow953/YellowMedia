@@ -66,6 +66,45 @@ Include relevant emojis and a call to action.";
         return $this->ask($prompt) ?? '';
     }
 
+    public function generatePostPrompts(BrandProfile $brandProfile, ?string $topic = null): array
+    {
+        $pillars = is_array($brandProfile->content_pillars)
+            ? implode(', ', $brandProfile->content_pillars)
+            : ($brandProfile->content_pillars ?? 'not specified');
+
+        $topicLine = $topic
+            ? "Focus specifically on this topic/feature the business wants to promote: {$topic}"
+            : "Generate ideas across a variety of content pillars.";
+
+        $prompt = "You are a social media content strategist helping a business plan their next Instagram posts.
+
+Business: {$brandProfile->business_name}
+Description: {$brandProfile->business_description}
+Target audience: {$brandProfile->target_audience}
+Tone: {$brandProfile->tone}
+Content pillars: {$pillars}
+Brand voice: {$brandProfile->voice_summary}
+
+Sample past captions:
+{$brandProfile->sample_captions}
+
+{$topicLine}
+
+Generate 6 specific, creative post prompt ideas that this business could use to generate an image right now.
+Return ONLY a valid JSON array of objects:
+[{\"prompt\": \"...\", \"pillar\": \"...\", \"format\": \"post|story|banner\"}]
+
+Rules:
+- Each prompt should be a clear description a designer could act on (not vague like \"motivational post\")
+- Reference the actual business, product, or audience specifically
+- Keep each prompt under 20 words
+- No jargon, no hashtags in the prompt itself";
+
+        $raw = $this->ask($prompt, 'application/json');
+
+        return json_decode($raw ?? '[]', true) ?? [];
+    }
+
     public function generateSuggestions(array $campaignData): array
     {
         $context = implode("\n", array_map(
@@ -74,8 +113,16 @@ Include relevant emojis and a call to action.";
             array_values($campaignData)
         ));
 
-        $prompt = "You are a Meta Ads expert. Analyze this campaign data and return ONLY a valid JSON array
-with 2-3 objects: [{\"type\": \"budget|audience|creative|copy|general\", \"priority\": \"low|medium|high\", \"suggestion\": \"...\"}]
+        $prompt = "You are a friendly marketing assistant helping a small business owner who is not familiar with advertising terminology.
+Analyze this campaign data and return ONLY a valid JSON array with 2-3 objects:
+[{\"type\": \"budget|audience|creative|copy|general\", \"priority\": \"low|medium|high\", \"suggestion\": \"...\"}]
+
+Rules for writing suggestions:
+- Write in plain, conversational language — no jargon or abbreviations like CTR, CPC, ROAS, CPM, etc.
+- If you must reference a metric, explain it in parentheses (e.g. \"cost per click (how much you pay each time someone taps your ad)\")
+- Focus on what action to take and why it will help the business, not on the numbers themselves
+- Be encouraging and practical — write as if advising a friend who runs a small business
+- Keep each suggestion to 1-2 sentences
 
 Campaign data:
 {$context}";

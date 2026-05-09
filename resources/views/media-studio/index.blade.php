@@ -140,6 +140,55 @@
         </div>
     </div>
 </div>
+{{-- Post Prompt Ideas --}}
+<div class="row g-4 mt-0">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header py-3 px-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="fw-semibold">Post Prompt Ideas</span>
+                    <span class="text-muted small ms-2">AI suggestions based on your brand profile</span>
+                </div>
+                @if(!$brandProfile?->hasVoice())
+                    <a href="{{ route('settings.index', ['tab' => 'brand']) }}" class="btn btn-outline-warning btn-sm">
+                        <i class="bi bi-palette me-1"></i> Set up Brand Profile first
+                    </a>
+                @endif
+            </div>
+            <div class="card-body px-4 pb-4">
+
+                @if($brandProfile?->hasVoice())
+                <div class="d-flex gap-2 mb-4">
+                    <input type="text" id="ideasTopic" class="form-control"
+                           placeholder="Optional: describe a topic or feature (e.g. Ramadan offer, new delivery feature, summer sale)">
+                    <button id="getIdeasBtn" class="btn btn-yellow text-nowrap">
+                        <i class="bi bi-lightbulb me-1"></i> Get Ideas
+                    </button>
+                </div>
+                @endif
+
+                {{-- Idle --}}
+                <div id="ideasIdle" class="text-center py-3 text-muted">
+                    <i class="bi bi-lightbulb fs-2 d-block mb-2 opacity-25"></i>
+                    <div class="small">Describe a topic or just click <strong>Get Ideas</strong> for general brand-based suggestions.</div>
+                </div>
+
+                {{-- Loading --}}
+                <div id="ideasLoading" class="text-center py-4 d-none">
+                    <div class="spinner-border spinner-border-sm me-2" style="color:var(--yellow);" role="status"></div>
+                    <span class="text-muted small">Thinking up ideas for you…</span>
+                </div>
+
+                {{-- Results --}}
+                <div id="ideasGrid" class="row g-3 d-none"></div>
+
+                {{-- Error --}}
+                <div id="ideasError" class="alert alert-danger d-none mb-0"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -229,5 +278,83 @@ document.getElementById('copyCaptionBtn')?.addEventListener('click', function() 
         setTimeout(() => { this.innerHTML = '<i class="bi bi-copy me-1"></i> Copy'; }, 2000);
     });
 });
+
+// Post Prompt Ideas
+const getIdeasBtn = document.getElementById('getIdeasBtn');
+if (getIdeasBtn) {
+    document.getElementById('ideasTopic')?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') getIdeasBtn.click();
+    });
+
+    getIdeasBtn.addEventListener('click', async function () {
+        document.getElementById('ideasIdle').classList.add('d-none');
+        document.getElementById('ideasGrid').classList.add('d-none');
+        document.getElementById('ideasError').classList.add('d-none');
+        document.getElementById('ideasLoading').classList.remove('d-none');
+        getIdeasBtn.disabled = true;
+
+        const topic = document.getElementById('ideasTopic')?.value.trim() ?? '';
+        const body  = new FormData();
+        if (topic) body.append('topic', topic);
+
+        try {
+            const res = await fetch('{{ route("media.prompt-ideas") }}', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                body,
+            });
+            const data = await res.json();
+
+            document.getElementById('ideasLoading').classList.add('d-none');
+
+            if (!res.ok || data.error) {
+                const err = document.getElementById('ideasError');
+                err.textContent = data.error ?? 'Something went wrong. Please try again.';
+                err.classList.remove('d-none');
+            } else {
+                const grid = document.getElementById('ideasGrid');
+                grid.innerHTML = '';
+
+                const formatLabels = { post: 'Post', story: 'Story', banner: 'Banner' };
+                const formatIcons  = { post: 'bi-image', story: 'bi-phone', banner: 'bi-display' };
+                const pillarColors = ['#F5C300', '#111111', '#6366f1', '#10b981', '#f97316', '#06b6d4'];
+
+                (data.prompts ?? []).forEach((item, i) => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-6 col-xl-4';
+                    col.innerHTML = `
+                        <div class="border rounded p-3 h-100 d-flex flex-column" style="background:#fafafa;">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge" style="background:${pillarColors[i % pillarColors.length]};color:${i===1?'#fff':'#111'};font-size:.7rem;">${item.pillar ?? ''}</span>
+                                <span class="text-muted small"><i class="bi ${formatIcons[item.format] ?? 'bi-image'} me-1"></i>${formatLabels[item.format] ?? 'Post'}</span>
+                            </div>
+                            <p class="mb-3 fw-semibold" style="font-size:.9rem;flex:1;">${item.prompt}</p>
+                            <button class="btn btn-sm btn-outline-dark use-prompt-btn" data-prompt="${item.prompt.replace(/"/g, '&quot;')}" data-format="${item.format ?? 'post'}">
+                                <i class="bi bi-arrow-up-left me-1"></i> Use this prompt
+                            </button>
+                        </div>`;
+                    grid.appendChild(col);
+                });
+
+                grid.classList.remove('d-none');
+            }
+        } catch (e) {
+            document.getElementById('ideasLoading').classList.add('d-none');
+            const err = document.getElementById('ideasError');
+            err.textContent = 'Failed to get ideas. Please try again.';
+            err.classList.remove('d-none');
+        } finally {
+            getIdeasBtn.disabled = false;
+        }
+    });
+
+    document.getElementById('ideasGrid').addEventListener('click', function (e) {
+        const btn = e.target.closest('.use-prompt-btn');
+        if (!btn) return;
+        document.getElementById('topic').value = btn.dataset.prompt;
+        document.getElementById('format').value = btn.dataset.format;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
 </script>
 @endpush

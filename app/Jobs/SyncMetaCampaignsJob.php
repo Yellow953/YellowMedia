@@ -7,6 +7,7 @@ use App\Notifications\SyncErrorNotification;
 use App\Services\MetaAdsService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
 
 class SyncMetaCampaignsJob implements ShouldQueue
 {
@@ -22,11 +23,18 @@ class SyncMetaCampaignsJob implements ShouldQueue
 
         foreach ($tenants as $tenant) {
             try {
+                Log::info("SyncMetaCampaignsJob: syncing tenant {$tenant->id} ({$tenant->name})");
                 $service->syncCampaigns($tenant->id);
+                Log::info("SyncMetaCampaignsJob: completed tenant {$tenant->id}");
             } catch (\Throwable $e) {
+                Log::error("SyncMetaCampaignsJob: failed for tenant {$tenant->id}", [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
                 $tenant->adminUsers()->each(
                     fn($user) => $user->notify(new SyncErrorNotification('Meta Ads', $e->getMessage()))
                 );
+                throw $e;
             }
         }
     }

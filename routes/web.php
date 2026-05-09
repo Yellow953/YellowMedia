@@ -36,6 +36,7 @@ Route::middleware(['auth', 'scope.tenant'])->group(function () {
             Route::get('/library', [MediaStudioController::class, 'library'])->name('library');
             Route::get('/status/{id}', [MediaStudioController::class, 'status'])->name('status');
             Route::delete('/{id}', [MediaStudioController::class, 'destroy'])->name('destroy');
+            Route::post('/prompt-ideas', [MediaStudioController::class, 'promptIdeas'])->name('prompt-ideas');
         });
 
         // Campaign Builder

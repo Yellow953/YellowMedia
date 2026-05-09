@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\GenerateImageJob;
 use App\Models\BrandProfile;
 use App\Models\GeneratedImage;
+use App\Services\GeminiTextService;
 use App\Services\PlanLimitService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -72,6 +73,21 @@ class MediaStudioController extends Controller
             ->paginate(12);
 
         return view('media-studio.library', compact('images'));
+    }
+
+    public function promptIdeas(Request $request, GeminiTextService $gemini)
+    {
+        $brandProfile = BrandProfile::where('tenant_id', $request->user()->tenant_id)->first();
+
+        if (! $brandProfile || ! $brandProfile->hasVoice()) {
+            return response()->json(['error' => 'Please set up your Brand Profile first so the AI knows your business.'], 422);
+        }
+
+        $topic = $request->string('topic')->trim()->value();
+
+        $prompts = $gemini->generatePostPrompts($brandProfile, $topic ?: null);
+
+        return response()->json(['prompts' => $prompts]);
     }
 
     public function destroy(int $id, Request $request)
