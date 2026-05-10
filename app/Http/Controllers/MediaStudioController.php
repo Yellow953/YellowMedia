@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\EditImageJob;
 use App\Jobs\GenerateImageJob;
 use App\Models\BrandProfile;
 use App\Models\GeneratedImage;
@@ -15,7 +16,14 @@ class MediaStudioController extends Controller
     public function index(Request $request)
     {
         $brandProfile = BrandProfile::where('tenant_id', $request->user()->tenant_id)->first();
-        return view('media-studio.index', compact('brandProfile'));
+        $editImage    = null;
+
+        if ($request->filled('edit')) {
+            $editImage = GeneratedImage::where('tenant_id', $request->user()->tenant_id)
+                ->find($request->integer('edit'));
+        }
+
+        return view('media-studio.index', compact('brandProfile', 'editImage'));
     }
 
     public function generate(Request $request, PlanLimitService $limits)
@@ -27,9 +35,11 @@ class MediaStudioController extends Controller
             'color_hint'   => 'nullable|string|max:100',
             'text_overlay' => 'nullable|string|max:200',
             'language'     => 'nullable|string|max:50',
+            'count'        => 'nullable|integer|min:1|max:4',
         ]);
 
-        $user = $request->user();
+        $user  = $request->user();
+        $count = (int) $request->input('count', 1);
 
         if (! $limits->canGenerateImage($user->tenant)) {
             $plan = $user->tenant->planLimits();
@@ -38,19 +48,24 @@ class MediaStudioController extends Controller
             ], 422);
         }
 
-        $validated = $request->validated();
+        $data = $request->only('topic', 'format', 'style', 'color_hint', 'text_overlay', 'language');
+        $ids  = [];
 
-        $image = GeneratedImage::create([
-            'tenant_id' => $user->tenant_id,
-            'user_id'   => $user->id,
-            'prompt'    => $validated['topic'],
-            'format'    => $validated['format'],
-            'status'    => 'pending',
-        ]);
+        for ($i = 0; $i < $count; $i++) {
+            $image = GeneratedImage::create([
+                'tenant_id'         => $user->tenant_id,
+                'user_id'           => $user->id,
+                'prompt'            => $data['topic'],
+                'format'            => $data['format'],
+                'status'            => 'pending',
+                'generation_params' => $data,
+            ]);
 
-        GenerateImageJob::dispatch($image, $request->only('topic', 'format', 'style', 'color_hint', 'text_overlay', 'language'));
+            GenerateImageJob::dispatch($image, $data);
+            $ids[] = $image->id;
+        }
 
-        return response()->json(['id' => $image->id]);
+        return response()->json(['ids' => $ids]);
     }
 
     public function status(int $id, Request $request)
@@ -88,6 +103,58 @@ class MediaStudioController extends Controller
         $prompts = $gemini->generatePostPrompts($brandProfile, $topic ?: null);
 
         return response()->json(['prompts' => $prompts]);
+    }
+
+    public function edit(Request $request, PlanLimitService $limits)
+    {
+        $request->validate([
+            'edit_prompt' => 'required|string|max:500',
+            'format'      => 'nullable|in:post,square,story,banner',
+            'image'       => 'nullable|file|image|max:10240',
+            'image_id'    => 'nullable|integer',
+        ]);
+
+        $user = $request->user();
+
+        if (! $limits->canGenerateImage($user->tenant)) {
+            $plan = $user->tenant->planLimits();
+            return response()->json([
+                'error' => "You've reached your {$plan['images_per_month']}-image monthly limit on the {$plan['name']} plan.",
+            ], 422);
+        }
+
+        // Resolve source image and save to a temp path (binary can't be JSON-serialised in the queue payload)
+        if ($request->hasFile('image')) {
+            $file       = $request->file('image');
+            $sourceMime = $file->getMimeType() ?? 'image/jpeg';
+            $ext        = $file->extension() ?: 'jpg';
+            $tempPath   = 'edit-tmp/' . uniqid() . '.' . $ext;
+            Storage::disk('public')->put($tempPath, file_get_contents($file->getRealPath()));
+            $format = $request->input('format', 'post');
+        } elseif ($request->filled('image_id')) {
+            $source = GeneratedImage::where('tenant_id', $user->tenant_id)
+                ->where('status', 'done')
+                ->findOrFail($request->integer('image_id'));
+
+            $tempPath   = $source->file_path;
+            $sourceMime = str_ends_with($source->file_path, '.jpg') ? 'image/jpeg' : 'image/png';
+            $format     = $request->input('format', $source->format);
+        } else {
+            return response()->json(['error' => 'Provide an image file or an image_id.'], 422);
+        }
+
+        $image = GeneratedImage::create([
+            'tenant_id'         => $user->tenant_id,
+            'user_id'           => $user->id,
+            'prompt'            => $request->input('edit_prompt'),
+            'format'            => $format,
+            'status'            => 'pending',
+            'generation_params' => ['edit_prompt' => $request->input('edit_prompt'), 'format' => $format],
+        ]);
+
+        EditImageJob::dispatch($image, $tempPath, $sourceMime, $request->input('edit_prompt'));
+
+        return response()->json(['id' => $image->id]);
     }
 
     public function destroy(int $id, Request $request)

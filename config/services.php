@@ -36,9 +36,9 @@ return [
     ],
 
     'google' => [
-        'api_key' => env('GOOGLE_AI_API_KEY'),
+        'api_key'     => env('GOOGLE_AI_API_KEY'),
         'image_model' => env('GOOGLE_IMAGE_MODEL', 'gemini-3-pro-image-preview'),
-        'text_model' => env('GOOGLE_TEXT_MODEL', 'gemini-2.0-flash'),
+        'text_model'  => env('GOOGLE_TEXT_MODEL', 'gemini-2.0-flash'),
     ],
 
     'meta' => [

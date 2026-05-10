@@ -33,6 +33,7 @@ Route::middleware(['auth', 'scope.tenant'])->group(function () {
         Route::prefix('media-studio')->name('media.')->group(function () {
             Route::get('/', [MediaStudioController::class, 'index'])->name('index');
             Route::post('/generate', [MediaStudioController::class, 'generate'])->name('generate');
+            Route::post('/edit', [MediaStudioController::class, 'edit'])->name('edit');
             Route::get('/library', [MediaStudioController::class, 'library'])->name('library');
             Route::get('/status/{id}', [MediaStudioController::class, 'status'])->name('status');
             Route::delete('/{id}', [MediaStudioController::class, 'destroy'])->name('destroy');

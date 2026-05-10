@@ -9,7 +9,11 @@ class GeneratedImage extends Model
 {
     protected $fillable = [
         'tenant_id', 'user_id', 'prompt', 'revised_prompt', 'caption',
-        'format', 'size', 'file_path', 'google_generation_id', 'status',
+        'format', 'size', 'file_path', 'google_generation_id', 'status', 'generation_params',
+    ];
+
+    protected $casts = [
+        'generation_params' => 'array',
     ];
 
     public function tenant(): BelongsTo
