@@ -47,15 +47,27 @@ class BrandProfileSeeder extends Seeder
                 ]),
                 'voice_summary'        => <<<'EOT'
 CAPTION VOICE: Bold and direct, speaking to Lebanese business owners like a peer. Short punchy sentences, specific benefits, zero fluff. Mix Arabic and English naturally in the same post — often a bold Arabic headline with an English sub-line or vice versa. 1-2 emojis max. CTAs are action-first: "Start free today", "جرّب مجاناً", "ابدأ الآن", "GO DIGITAL". Hashtags always include #YellowPOS #Lebanon #لبنان plus a niche tag. Tie every feature to a real Lebanese business pain (dual currency chaos, WhatsApp orders, cash payments, power cuts).
-
-IMAGE VISUAL STYLE (follow this precisely):
-- BACKGROUND: Either (A) pure black/very dark background with dramatic golden glowing light rays and floating gold particle sparkles, OR (B) solid bright yellow (#F5C300) background. Never generic backgrounds, gradients, or stock imagery backdrops.
-- HERO SUBJECT: A high-quality, photorealistic product shot specific to the industry being targeted — e.g. a burger for restaurants, perfume bottle for fragrance shops, supplement jars for gyms, grocery bag with vegetables for supermarkets, beauty products for cosmetics. The product should be large, premium, and cinematic.
-- PHONE MOCKUP: A modern smartphone showing the YellowPOS app UI (yellow interface, product listings, order confirmation). The phone and the hero product are the two main elements. Products often appear to burst or float out of the phone screen with golden sparkle particle effects.
-- TYPOGRAPHY STYLE: Bold, heavy, all-caps headline text. White text on dark backgrounds. Black or dark text on yellow backgrounds. Short powerful phrases: "TURN SCENTS INTO SALES", "BE FOUND. BE READY.", "POWER YOUR SALES."
-- FEATURE ICONS: Small row of yellow icons representing: fast delivery, WhatsApp, QR code, online ordering. Minimal and clean.
-- MOOD: High-energy, premium commercial advertisement aesthetic. Think global brand ad meets Lebanese street energy. Dramatic lighting, sharp contrasts.
-- COLOR PALETTE: Yellow #F5C300, black #111111, white. Golden glow accents. No other colors dominate.
+IMAGE VISUAL STYLE:
+BRAND PALETTE: Yellow #F5C300, black #111111, white. These three colors are the only dominant palette. Golden glow accents are optional.
+BACKGROUND — rotate between these options, do NOT always use dark/black:
+- Pure black/dark background with dramatic golden light rays and floating gold particle sparkles
+- Solid bright yellow (#F5C300) background with black or white text
+- Clean white or off-white background with yellow and black accents
+- Split layout: left half yellow + right half black (or vice versa)
+- Dark background with a spotlight/studio light effect on the hero
+HERO SUBJECT: A high-quality, photorealistic product shot specific to the industry — a burger, perfume bottle, supplement jars, grocery bag, beauty products. Large, premium, cinematic. Photorealistic, not 3D-rendered cartoon style.
+PHONE MOCKUP: Optional — only include a smartphone mockup when it adds to the concept. Do NOT default to including a phone in every single image. Many great designs have no phone at all.
+TYPOGRAPHY: Bold, heavy, all-caps or mixed-case headlines. White on dark backgrounds. Black or dark text on yellow/white backgrounds. Short powerful phrases.
+LAYOUT — vary between these styles per generation:
+- Large bold typographic headline dominating top third, product below
+- Hero product close-up filling 60% of frame with text on the side
+- Icon grid — feature icons in a clean row with short labels
+- Split panel — two distinct zones for visual and text
+- Flat lay top-down composition
+- Stat or testimonial card with a big number or quote as focal point
+- Lifestyle or in-context scene (business owner using the product)
+MOOD: High-energy, premium commercial advertisement. Dramatic lighting, sharp contrasts. Think global brand ad meets Lebanese street energy.
+IMPORTANT: Do NOT include any brand name, logo, or wordmark. Do NOT repeat the same phone + dark background + sparkles layout every time.
 EOT,
             ]
         );
